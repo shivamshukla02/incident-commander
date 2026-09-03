@@ -18,3 +18,22 @@ export function generateAgoraToken(channelName, uid) {
   );
   return token;
 }
+
+export function generateConvoAiToken(channelName, uid) {
+  const appId = process.env.AGORA_APP_ID;
+  const appCertificate = process.env.AGORA_APP_CERTIFICATE;
+  const expireTimeSeconds = 86400; // 24 hours, matches Agora's docs recommendation
+  const currentTimestamp = Math.floor(Date.now() / 1000);
+  const privilegeExpiredTs = currentTimestamp + expireTimeSeconds;
+
+  const token = RtcTokenBuilder.buildTokenWithRtm(
+    appId,
+    appCertificate,
+    channelName,
+    uid,
+    RtcRole.PUBLISHER,
+    privilegeExpiredTs,
+    privilegeExpiredTs
+  );
+  return token;
+}

@@ -1,5 +1,5 @@
 import express from "express";
-import { generateAgoraToken } from "../agora/tokenGenerator.js";
+import { generateAgoraToken, generateConvoAiToken } from "../agora/tokenGenerator.js";
 
 const router = express.Router();
 
@@ -9,6 +9,12 @@ router.post("/token", (req, res) => {
     return res.status(400).json({ error: "channelName and uid required" });
   }
   const token = generateAgoraToken(channelName, uid);
+  res.json({ token, appId: process.env.AGORA_APP_ID });
+});
+
+router.post("/rtm-token", (req, res) => {
+  const { channelName, uid } = req.body;
+  const token = generateConvoAiToken(channelName, uid);
   res.json({ token, appId: process.env.AGORA_APP_ID });
 });
 

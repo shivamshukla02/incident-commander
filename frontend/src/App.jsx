@@ -1,3 +1,4 @@
+import { loginRtm, logoutRtm } from "./agoraRtm";
 import { signInWithGoogle } from "./firebase";
 import axios from "axios";
 import io from "socket.io-client";
@@ -118,8 +119,26 @@ socket.on("participant_joined", (data) => {
     setJoining(true);
     try {
       const uid = Math.floor(Math.random() * 100000);
-      const track = await joinChannel(`incident-room-${code}`, uid);
+      const channelName = `incident-room-${code}`;
+      const track = await joinChannel(channelName, uid);
       setAudioTrack(track);
+
+      // invite Agora's native Conversational AI agent into this room
+      try {
+        await axios.post(`${API}/agent/invite`, { channelName });
+      } catch (e) {
+        console.error("agent invite failed:", e);
+      }
+
+      // listen for the agent's transcript events over RTM
+      try {
+        await loginRtm(channelName, uid, async (text, speaker, role) => {
+          await axios.post(`${API}/transcript`, { text, speaker, role });
+        });
+      } catch (e) {
+        console.error("rtm login failed:", e);
+      }
+
       const rec = startSpeechRecognition("You", "Participant", async (text, speaker, role) => {
         try {
           await axios.post(`${API}/transcript`, { text, speaker, role });
@@ -138,6 +157,7 @@ socket.on("participant_joined", (data) => {
 
   const handleLeaveRoom = async () => {
     await leaveChannel(audioTrack);
+     await logoutRtm();
     stopSpeechRecognition(recognition);
     setAudioTrack(null);
     setRecognition(null);

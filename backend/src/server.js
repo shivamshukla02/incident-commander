@@ -3,7 +3,7 @@ import express from "express";
 import cors from "cors";
 import http from "http";
 import { Server } from "socket.io";
-
+import agentRoutes from "./routes/agent.js";
 import agoraRoutes from "./routes/agora.js";
 import transcriptRoutes from "./routes/transcript.js";
 import actionsRoutes from "./routes/actions.js";
@@ -18,7 +18,7 @@ const io = new Server(server, { cors: { origin: "*" } });
 app.use("/api/agora", agoraRoutes);
 app.use("/api/transcript", transcriptRoutes(io));
 app.use("/api/actions", actionsRoutes(io));
-
+app.use("/api/agent", agentRoutes);
 io.on("connection", (socket) => {
   socket.on("user_joined", (userData) => {
   socket.broadcast.emit("participant_joined", userData);
