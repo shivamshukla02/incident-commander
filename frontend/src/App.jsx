@@ -124,7 +124,13 @@ socket.on("participant_joined", (data) => {
       const channelName = `incident-room-${code}`;
       const track = await joinChannel(channelName, uid, (uids) => setRemoteUids(uids));
       setAudioTrack(track);
-
+ window.onAgentMessage = async (data, msgUid) => {
+        console.log("Agent event:", data.object, data);
+        if (data.object === "message.transcribe" && data.text) {
+          const speaker = msgUid === 9999 ? "SYNTRIX Agent" : "Participant";
+          await axios.post(`${API}/transcript`, { text: data.text, speaker, role: "assistant" });
+        }
+      };
       // invite Agora's native Conversational AI agent into this room
       try {
         await axios.post(`${API}/agent/invite`, { channelName });

@@ -22,8 +22,20 @@ export async function joinChannel(channelName, uid, onRemoteUserChange) {
     if (onRemoteUserChange) onRemoteUserChange(client.remoteUsers.map(u => u.uid));
   });
 
-  client.on("stream-message", (uid, payload) => {
-  console.log("STREAM MESSAGE from uid", uid, ":", new TextDecoder().decode(payload));
+client.on("stream-message", (uid, payload) => {
+  try {
+    const decoded = new TextDecoder().decode(payload);
+    const parts = decoded.split("|");
+    if (parts.length >= 4) {
+      const base64Data = parts[3];
+      const jsonStr = atob(base64Data);
+      const data = JSON.parse(jsonStr);
+      console.log("PARSED AGENT MESSAGE:", data);
+      if (window.onAgentMessage) window.onAgentMessage(data, uid);
+    }
+  } catch (e) {
+    console.log("stream message parse error:", e);
+  }
 });
 
   client.on("user-left", () => {
