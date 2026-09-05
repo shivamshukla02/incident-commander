@@ -22,6 +22,10 @@ export async function joinChannel(channelName, uid, onRemoteUserChange) {
     if (onRemoteUserChange) onRemoteUserChange(client.remoteUsers.map(u => u.uid));
   });
 
+  client.on("stream-message", (uid, payload) => {
+  console.log("STREAM MESSAGE from uid", uid, ":", new TextDecoder().decode(payload));
+});
+
   client.on("user-left", () => {
     if (onRemoteUserChange) onRemoteUserChange(client.remoteUsers.map(u => u.uid));
   });
