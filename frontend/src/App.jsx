@@ -71,6 +71,7 @@ function generateMeetingCode() {
 }
 
 export default function SyntrixIncidentCommander() {
+  const [remoteUids, setRemoteUids] = useState([]);
   const [currentUser, setCurrentUser] = useState(null);
 const [participants, setParticipants] = useState([]);
   const [screen, setScreen] = useState("landing"); // landing | app
@@ -120,7 +121,7 @@ socket.on("participant_joined", (data) => {
     try {
       const uid = Math.floor(Math.random() * 100000);
       const channelName = `incident-room-${code}`;
-      const track = await joinChannel(channelName, uid);
+      const track = await joinChannel(channelName, uid, (uids) => setRemoteUids(uids));
       setAudioTrack(track);
 
       // invite Agora's native Conversational AI agent into this room
@@ -147,6 +148,10 @@ socket.on("participant_joined", (data) => {
       setRecognition(rec);
       setInRoom(true);
       socket.emit("user_joined", { name: currentUser.displayName, photo: currentUser.photoURL, id: socket.id });
+      socket.emit("request_roster");
+socket.on("roster_request", () => {
+  socket.emit("user_joined", { name: currentUser.displayName, photo: currentUser.photoURL, id: socket.id });
+});
     } catch (err) {
       console.error("failed to join room:", err);
       alert("Could not join voice room — check mic permission.");

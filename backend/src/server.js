@@ -21,10 +21,14 @@ app.use("/api/actions", actionsRoutes(io));
 app.use("/api/agent", agentRoutes);
 io.on("connection", (socket) => {
   socket.on("user_joined", (userData) => {
-  socket.broadcast.emit("participant_joined", userData);
-});
+    socket.broadcast.emit("participant_joined", userData);
+  });
+
+  socket.on("request_roster", () => {
+    socket.broadcast.emit("roster_request");
+  });
+
   console.log("dashboard connected:", socket.id);
 });
-
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => console.log(`server running on ${PORT}`));
