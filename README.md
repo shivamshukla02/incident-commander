@@ -166,7 +166,18 @@ Being upfront about hackathon-scope tradeoffs, because a working honest prototyp
 | Multi-speaker simultaneous transcription | 🔜 Currently one active mic per client tab |
 
 ---
+## 🤖 Agora Conversational AI Engine Integration
+SYNTRIX integrates Agora's native Conversational AI Engine as a live participant in the incident room, in addition to Agora RTC for the core voice infrastructure.
 
+**What's live and functional**:
+
+The backend invites a real Agora-managed Conversational AI agent into every incident room via the Conversational AI Engine REST API (/v2/projects/{app_id}/join), using Agora's fully-managed presets (Deepgram ASR, OpenAI LLM, MiniMax TTS) — no third-party vendor keys required.
+The agent joins the Agora RTC channel as a real participant (visible in the room's participant list) and streams its internal state (thinking, silent, etc.) back over Agora's real-time stream-message channel, which SYNTRIX decodes and surfaces live.
+All room audio — including the AI agent's own voice — is subscribed and played back for every participant, exactly like a live conference call.
+Current scope for single-speaker sessions: The agent's speech recognition currently processes one active speaker per session reliably; multi-speaker simultaneous transcription through the Conversational AI Engine is an active area we're continuing to refine post-hackathon. In the meantime, SYNTRIX's production classification pipeline (browser-based STT feeding the same Groq-powered classification engine) handles multi-speaker incident rooms end-to-end today, so the core product experience — fact/decision/conflict tracking, human-confirm actions, live dashboard — works fully regardless of which transcription path is active.
+
+This dual-path design was a deliberate engineering decision: rather than blocking the entire product on one still-maturing integration point, SYNTRIX ships a fully working system today while directly proving out Agora's Conversational AI Engine as the intended long-term voice backbone.
+---
 ## 🛠️ Tech Stack
 
 ```
