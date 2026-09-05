@@ -105,6 +105,7 @@ const [participants, setParticipants] = useState([]);
     socket.on("action_proposed", (data) => setProposedAction(data));
     socket.on("action_executed", () => setProposedAction(null));
 socket.on("participant_joined", (data) => {
+  console.log("received participant_joined:", data);
   setParticipants((prev) => [...prev, data]);
 });
     return () => {
@@ -149,6 +150,7 @@ socket.on("participant_joined", (data) => {
       setInRoom(true);
       socket.emit("user_joined", { name: currentUser.displayName, photo: currentUser.photoURL, id: socket.id });
       socket.emit("request_roster");
+      console.log("emitted request_roster, my id:", socket.id, "displayName:", currentUser?.displayName);
 socket.on("roster_request", () => {
   socket.emit("user_joined", { name: currentUser.displayName, photo: currentUser.photoURL, id: socket.id });
 });
